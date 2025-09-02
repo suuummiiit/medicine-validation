@@ -1,0 +1,79 @@
+[
+  {
+    "value": 483920,
+    "name": "Bevon",
+    "alternatives": {
+      "1": "Zincovit",
+      "2": "Supradyn",
+      "3": "Centrum",
+      "4": "Neurobion",
+      "5": "Revitalize Gold"
+    }
+  },
+  {
+    "value": 912457,
+    "name": "PANTOAGMA-D",
+    "alternatives": {
+      "1": "Pantosern-D",
+      "2": "Prozole-D",
+      "3": "Tapaq D",
+      "4": "Pantodom-D",
+      "5": "Amom-D"
+    }
+  },
+  {
+    "value": 742931,
+    "name": "Fraxium",
+    "alternatives": {
+      "1": "AlgaeCal Plus",
+      "2": "Citracal Plus",
+      "3": "Bone Guard Forte",
+      "4": "Sundown Calcium-Magnesium-Zinc + D3",
+      "5": "Calcium+Magnesium+Zinc+D3+Cissus formula (Amazon)"
+    }
+  },
+  {
+    "value": 726341,
+    "name": "Zyfix-200",
+    "alternatives": {
+      "1": "Aquris Cef 200",
+      "2": "Taxim-O 200",
+      "3": "Cefix-200",
+      "4": "Zifi 200",
+      "5": "Ceftas-200"
+    }
+  },
+  {
+    "value": 384759,
+    "name": "Clopiros-Gold 20",
+    "alternatives": {
+      "1": "Atorva-Gold 20",
+      "2": "Clopitab-CV Gold 20",
+      "3": "AztoGold 20",
+      "4": "Ecosprin Gold 20",
+      "5": "Clavix Gold-20"
+    }
+  },
+  {
+    "value": 590214,
+    "name": "Akulc",
+    "alternatives": {
+      "1": "Alnuron-LC",
+      "2": "Cobaleo-LC",
+      "3": "Myofest-Max",
+      "4": "Puremeth LC",
+      "5": "Starcob LC"
+    }
+  },
+  {
+    "value": 675843,
+    "name": "Cisslaris",
+    "alternatives": {
+      "1": "Ciss-Q (Cissus quadrangularis)",
+      "2": "Cissavit",
+      "3": "Cissus Plus",
+      "4": "Cissus Extract Capsules",
+      "5": "Cissus Max"
+    }
+  }
+]
