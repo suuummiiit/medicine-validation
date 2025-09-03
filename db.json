@@ -2,6 +2,9 @@
   {
     "value": 483920,
     "name": "Bevon",
+    "batch_number": "Z06AH25023",
+    "LIC": null,
+    "expiry_date": "2026-09",
     "alternatives": {
       "1": "Zincovit",
       "2": "Supradyn",
@@ -13,6 +16,9 @@
   {
     "value": 912457,
     "name": "PANTOAGMA-D",
+    "batch_number": "ABX07AAA",
+    "LIC": null,
+    "expiry_date": "2027-03",
     "alternatives": {
       "1": "Pantosern-D",
       "2": "Prozole-D",
@@ -24,6 +30,9 @@
   {
     "value": 742931,
     "name": "Fraxium",
+    "batch_number": "DT-177",
+    "LIC": "10021022000780",
+    "expiry_date": "2026-07",
     "alternatives": {
       "1": "AlgaeCal Plus",
       "2": "Citracal Plus",
@@ -35,6 +44,9 @@
   {
     "value": 726341,
     "name": "Zyfix-200",
+    "batch_number": "41215063",
+    "LIC": "MLF282024JK000013",
+    "expiry_date": "2027-05",
     "alternatives": {
       "1": "Aquris Cef 200",
       "2": "Taxim-O 200",
@@ -46,6 +58,9 @@
   {
     "value": 384759,
     "name": "Clopiros-Gold 20",
+    "batch_number": "CSL24002",
+    "LIC": "34/UA/2013",
+    "expiry_date": "2026-05",
     "alternatives": {
       "1": "Atorva-Gold 20",
       "2": "Clopitab-CV Gold 20",
@@ -57,6 +72,9 @@
   {
     "value": 590214,
     "name": "Akulc",
+    "batch_number": "MNT - 125226",
+    "LIC": null,
+    "expiry_date": "2026-06",
     "alternatives": {
       "1": "Alnuron-LC",
       "2": "Cobaleo-LC",
@@ -68,6 +86,9 @@
   {
     "value": 675843,
     "name": "Cisslaris",
+    "batch_number": "T2602B25",
+    "LIC": "10018064001435",
+    "expiry_date": "2026-09",
     "alternatives": {
       "1": "Ciss-Q (Cissus quadrangularis)",
       "2": "Cissavit",
