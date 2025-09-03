@@ -1,6 +1,6 @@
 [
   {
-    "value": 483920,
+    "value": 809290,
     "name": "Bevon",
     "batch_number": "Z06AH25023",
     "LIC": null,
@@ -14,7 +14,7 @@
     }
   },
   {
-    "value": 912457,
+    "value": 165772,
     "name": "PANTOAGMA-D",
     "batch_number": "ABX07AAA",
     "LIC": null,
@@ -28,7 +28,7 @@
     }
   },
   {
-    "value": 742931,
+    "value": 325659,
     "name": "Fraxium",
     "batch_number": "DT-177",
     "LIC": "10021022000780",
@@ -42,7 +42,7 @@
     }
   },
   {
-    "value": 726341,
+    "value": 864335,
     "name": "Zyfix-200",
     "batch_number": "41215063",
     "LIC": "MLF282024JK000013",
@@ -56,7 +56,7 @@
     }
   },
   {
-    "value": 384759,
+    "value": 774586,
     "name": "Clopiros-Gold 20",
     "batch_number": "CSL24002",
     "LIC": "34/UA/2013",
@@ -70,7 +70,7 @@
     }
   },
   {
-    "value": 590214,
+    "value": 694842,
     "name": "Akulc",
     "batch_number": "MNT - 125226",
     "LIC": null,
@@ -84,7 +84,7 @@
     }
   },
   {
-    "value": 675843,
+    "value": 653677,
     "name": "Cisslaris",
     "batch_number": "T2602B25",
     "LIC": "10018064001435",
@@ -96,5 +96,13 @@
       "4": "Cissus Extract Capsules",
       "5": "Cissus Max"
     }
+  },
+  {
+    "value": 584515,
+    "name": "Invalid",
+    "batch_number": null,
+    "LIC": null,
+    "expiry_date": null,
+    "alternatives": {}
   }
 ]
