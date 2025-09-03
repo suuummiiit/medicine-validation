@@ -189,7 +189,7 @@ class App(ctk.CTk):
         super().__init__()
         
         # Window setup
-        self.title("Professional Medicine Validation System")
+        self.title("MedGaurd")
         self.geometry("1400x900")
         self.configure(fg_color="#f8f9fa")
         
@@ -210,6 +210,7 @@ class App(ctk.CTk):
         
         # State variables
         self.processing = False
+        self.should_stop_processing = False  # Flag to stop processing
         self.current_step = ""
         self.captured_frame = None
         self.current_frame = None
@@ -336,8 +337,7 @@ class App(ctk.CTk):
         self.content_container.pack(fill="both", expand=True, padx=20, pady=20)
         
         # Create panels
-        self.create_valid_medicine_panel()
-        self.create_invalid_medicine_panel()
+        self.create_result_panel()
         self.create_processing_panel()
         
         # Show initial state
@@ -364,22 +364,23 @@ class App(ctk.CTk):
         
         self.processing_text = ctk.CTkLabel(
             processing_frame,
-            text="Analyzing Medicine...",
+            text="Starting Analysis...",
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color=self.colors['text_secondary']
         )
         self.processing_text.pack(expand=True)
         
-    def create_valid_medicine_panel(self):
-        self.valid_panel = ctk.CTkFrame(
+    def create_result_panel(self):
+        """Create unified result panel for both valid and invalid medicines"""
+        self.result_panel = ctk.CTkFrame(
             self.content_container,
             fg_color="transparent"
         )
         
-        # Status header
+        # Status header (will be updated based on validity)
         self.status_frame = ctk.CTkFrame(
-            self.valid_panel,
-            fg_color="#d4edda",
+            self.result_panel,
+            fg_color="#d4edda",  # Default to success
             corner_radius=8,
             border_width=1,
             border_color="#c3e6cb"
@@ -407,205 +408,70 @@ class App(ctk.CTk):
         
         # Scrollable content area
         self.info_container = ctk.CTkScrollableFrame(
-            self.valid_panel,
+            self.result_panel,
             fg_color="transparent"
         )
         self.info_container.pack(fill="both", expand=True)
         
-        # Medicine information fields
-        self.medicine_fields = {}
-        self.create_info_fields()
+        # Medicine information fields - will be created dynamically
+        self.result_fields = {}
         
-    def create_info_fields(self):
-        """Create professional information fields"""
-        fields_data = [
-            ("name", "Medicine Name", "No data"),
-            ("value", "Database Value", "No data"),
-            ("batch", "Batch Number", "No data"),
-            ("expiry", "Expiry Date", "No data"),
-            ("license", "License", "No data"),
-            ("manufacturer", "Manufacturer", "No data"),
-            ("alternatives", "Alternatives", "No data"),
-            ("ocr_analysis", "OCR Analysis", "No data")
-        ]
-        
-        for field_id, label_text, value_text in fields_data:
-            field_frame = ctk.CTkFrame(
-                self.info_container,
-                fg_color="#ffffff",
-                corner_radius=8,
-                border_width=1,
-                border_color=self.colors['border']
-            )
-            
-            # Label
-            label = ctk.CTkLabel(
-                field_frame,
-                text=label_text,
-                font=ctk.CTkFont(size=12, weight="bold"),
-                text_color=self.colors['text_secondary'],
-                anchor="w"
-            )
-            label.pack(fill="x", padx=15, pady=(12, 2))
-            
-            # Value
-            value_label = ctk.CTkLabel(
-                field_frame,
-                text=value_text,
-                font=ctk.CTkFont(size=14),
-                text_color=self.colors['text_primary'],
-                anchor="w",
-                wraplength=350
-            )
-            value_label.pack(fill="x", padx=15, pady=(0, 12))
-            
-            self.medicine_fields[field_id] = {
-                'frame': field_frame,
-                'value': value_label,
-                'current_text': value_text
-            }
-            
-            field_frame.pack(fill="x", pady=3)
-        
-    def create_invalid_medicine_panel(self):
-        self.invalid_panel = ctk.CTkFrame(
-            self.content_container,
-            fg_color="transparent"
-        )
-        
-        # Error status
-        error_frame = ctk.CTkFrame(
-            self.invalid_panel,
-            fg_color="#f8d7da",
+    def create_result_field(self, field_id, label_text, value_text, icon="✓", color="#28a745"):
+        """Create a single result field with icon"""
+        field_frame = ctk.CTkFrame(
+            self.info_container,
+            fg_color="#ffffff",
             corner_radius=8,
-            border_width=1,
-            border_color="#f5c6cb"
-        )
-        error_frame.pack(fill="x", pady=(0, 20))
-        
-        error_content = ctk.CTkFrame(error_frame, fg_color="transparent")
-        error_content.pack(padx=20, pady=15)
-        
-        self.error_icon = ctk.CTkLabel(
-            error_content,
-            text="⚠",
-            font=ctk.CTkFont(size=24, weight="bold"),
-            text_color=self.colors['error']
-        )
-        self.error_icon.pack(side="left", padx=(0, 10))
-        
-        self.error_text = ctk.CTkLabel(
-            error_content,
-            text="INVALID MEDICINE DETECTED",
-            font=ctk.CTkFont(size=16, weight="bold"),
-            text_color=self.colors['error']
-        )
-        self.error_text.pack(side="left")
-        
-        # OCR data display for invalid medicines
-        self.invalid_info_container = ctk.CTkScrollableFrame(
-            self.invalid_panel,
-            fg_color="transparent"
-        )
-        self.invalid_info_container.pack(fill="both", expand=True)
-        
-        # Create OCR fields for invalid medicines
-        self.invalid_fields = {}
-        ocr_fields_data = [
-            ("ocr_name", "Detected Name", "No data"),
-            ("ocr_batch", "Batch Number", "No data"),
-            ("ocr_expiry", "Expiry Date", "No data"),
-            ("ocr_license", "License", "No data"),
-            ("ocr_manufacturer", "Manufacturer", "No data"),
-            ("db_lookup", "Database Lookup", "No data")
-        ]
-        
-        for field_id, label_text, value_text in ocr_fields_data:
-            field_frame = ctk.CTkFrame(
-                self.invalid_info_container,
-                fg_color="#ffffff",
-                corner_radius=8,
-                border_width=1,
-                border_color=self.colors['border']
-            )
-            
-            # Label
-            label = ctk.CTkLabel(
-                field_frame,
-                text=label_text,
-                font=ctk.CTkFont(size=12, weight="bold"),
-                text_color=self.colors['text_secondary'],
-                anchor="w"
-            )
-            label.pack(fill="x", padx=15, pady=(12, 2))
-            
-            # Value
-            value_label = ctk.CTkLabel(
-                field_frame,
-                text=value_text,
-                font=ctk.CTkFont(size=14),
-                text_color=self.colors['text_primary'],
-                anchor="w",
-                wraplength=350
-            )
-            value_label.pack(fill="x", padx=15, pady=(0, 12))
-            
-            self.invalid_fields[field_id] = {
-                'frame': field_frame,
-                'value': value_label,
-                'current_text': value_text
-            }
-            
-            field_frame.pack(fill="x", pady=3)
-        
-    def create_status_bar(self):
-        # Professional status bar
-        self.status_bar = ctk.CTkFrame(
-            self,
-            fg_color=self.colors['card_bg'],
-            corner_radius=8,
-            height=50,
             border_width=1,
             border_color=self.colors['border']
         )
-        self.status_bar.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
-        self.status_bar.grid_propagate(False)
         
-        # Status content
-        status_content = ctk.CTkFrame(self.status_bar, fg_color="transparent")
-        status_content.pack(fill="both", expand=True, padx=20, pady=12)
+        # Header with icon and label
+        header_frame = ctk.CTkFrame(field_frame, fg_color="transparent")
+        header_frame.pack(fill="x", padx=15, pady=(12, 2))
         
-        # System status
-        self.system_status = ctk.CTkLabel(
-            status_content,
-            text="● System Online",
+        # Icon
+        icon_label = ctk.CTkLabel(
+            header_frame,
+            text=icon,
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=color
+        )
+        icon_label.pack(side="left", padx=(0, 8))
+        
+        # Label
+        label = ctk.CTkLabel(
+            header_frame,
+            text=label_text,
             font=ctk.CTkFont(size=12, weight="bold"),
-            text_color=self.colors['success']
+            text_color=self.colors['text_secondary'],
+            anchor="w"
         )
-        self.system_status.pack(side="left")
+        label.pack(side="left", fill="x", expand=True)
         
-        # Processing status
-        self.processing_status = ctk.CTkLabel(
-            status_content,
-            text="Waiting for input...",
-            font=ctk.CTkFont(size=12),
-            text_color=self.colors['text_secondary']
+        # Value
+        value_label = ctk.CTkLabel(
+            field_frame,
+            text=value_text,
+            font=ctk.CTkFont(size=14),
+            text_color=self.colors['text_primary'],
+            anchor="w",
+            wraplength=350
         )
-        self.processing_status.pack(side="left", padx=(30, 0))
+        value_label.pack(fill="x", padx=15, pady=(0, 12))
         
-        # Reset button
-        self.reset_button = ctk.CTkButton(
-            status_content,
-            text="RESET",
-            width=100,
-            height=28,
-            fg_color=self.colors['error'],
-            hover_color="#c82333",
-            corner_radius=6,
-            font=ctk.CTkFont(size=12, weight="bold"),
-            command=self.reset_analysis
-        )
-        self.reset_button.pack(side="right")
+        self.result_fields[field_id] = {
+            'frame': field_frame,
+            'icon': icon_label,
+            'label': label,
+            'value': value_label,
+            'current_text': value_text
+        }
+        
+        # Initially hide the field (will be shown with animation)
+        field_frame.pack_forget()
+        
+        return field_frame
         
     def show_waiting_panel(self):
         """Show waiting state"""
@@ -634,88 +500,67 @@ class App(ctk.CTk):
         self.processing_panel.pack(fill="both", expand=True)
         self.processing_main_indicator.start()
         
-    def show_valid_panel(self):
-        """Show valid medicine panel with slide-in animations"""
+    def show_result_panel(self, is_valid_medicine):
+        """Show result panel with appropriate styling"""
         self.hide_all_panels()
-        self.valid_panel.pack(fill="both", expand=True)
         
-        # Animate fields sliding in sequentially
-        for i, (field_id, field_data) in enumerate(self.medicine_fields.items()):
-            delay = i * 50  # Stagger the animations
-            self.after(delay, lambda f=field_data['frame']: self.animate_field_slide_in(f))
+        # Update status frame based on validity
+        if is_valid_medicine:
+            self.status_frame.configure(fg_color="#d4edda", border_color="#c3e6cb")
+            self.status_icon.configure(text="✓", text_color=self.colors['success'])
+            self.status_text.configure(text="VERIFIED MEDICINE", text_color=self.colors['success'])
+        else:
+            self.status_frame.configure(fg_color="#f8d7da", border_color="#f5c6cb")
+            self.status_icon.configure(text="⚠", text_color=self.colors['error'])
+            self.status_text.configure(text="INVALID MEDICINE DETECTED", text_color=self.colors['error'])
         
-    def show_invalid_panel(self):
-        """Show invalid medicine panel"""
-        self.hide_all_panels()
-        self.invalid_panel.pack(fill="both", expand=True)
-        
-        # Animate fields for invalid panel too
-        for i, (field_id, field_data) in enumerate(self.invalid_fields.items()):
-            delay = i * 50  # Stagger the animations
-            self.after(delay, lambda f=field_data['frame']: self.animate_field_slide_in(f))
+        self.result_panel.pack(fill="both", expand=True)
         
     def hide_all_panels(self):
         """Hide all content panels"""
         self.processing_main_indicator.stop()
         for child in self.content_container.winfo_children():
             child.pack_forget()
+        
+        # Clear existing result fields
+        for field_id, field_data in self.result_fields.items():
+            field_data['frame'].destroy()
+        self.result_fields.clear()
     
-    def animate_field_slide_in(self, field_frame):
-        """Animate individual field sliding in"""
-        # Store original position
-        field_frame.pack_forget()
+    def animate_field_display(self, field_frame, delay=0):
+        """Animate field display with fade effect"""
+        def show_field():
+            # Show field with fade animation
+            field_frame.pack(fill="x", pady=3)
+            
+            # Simple fade effect by changing opacity (simulated with color changes)
+            original_fg = field_frame.cget("fg_color")
+            
+            def fade_in(alpha=0.1):
+                if alpha <= 1.0:
+                    # Simulate fade by adjusting the background
+                    field_frame.configure(fg_color="#ffffff")
+                    self.after(20, lambda: fade_in(alpha + 0.1))
+            
+            fade_in()
         
-        # Create temporary frame for animation
-        temp_frame = ctk.CTkFrame(
-            field_frame.master,
-            fg_color="transparent",
-            height=field_frame.winfo_reqheight()
-        )
-        temp_frame.pack(fill="x", pady=3)
-        
-        # Animate slide in
-        def slide_step(offset=300):
-            if offset > 0:
-                # Move field frame
-                field_frame.place(in_=temp_frame, x=-offset, y=0, relwidth=1)
-                temp_frame.after(16, lambda: slide_step(offset - 15))
-            else:
-                # Animation complete - restore normal packing
-                field_frame.place_forget()
-                temp_frame.destroy()
-                field_frame.pack(fill="x", pady=3)
-        
-        slide_step()
-    
-    def update_medicine_field(self, field_id, new_value):
-        """Update a medicine field with animation"""
-        if field_id in self.medicine_fields:
-            field_data = self.medicine_fields[field_id]
-            if field_data['current_text'] != new_value:
-                # Flash animation for value change
-                FieldAnimator.value_change_flash(field_data['frame'], new_value)
-                field_data['value'].configure(text=new_value)
-                field_data['current_text'] = new_value
-                
-    def update_invalid_field(self, field_id, new_value):
-        """Update an invalid medicine field with animation"""
-        if field_id in self.invalid_fields:
-            field_data = self.invalid_fields[field_id]
-            if field_data['current_text'] != new_value:
-                # Flash animation for value change
-                FieldAnimator.value_change_flash(field_data['frame'], new_value)
-                field_data['value'].configure(text=new_value)
-                field_data['current_text'] = new_value
+        if delay > 0:
+            self.after(int(delay * 1000), show_field)
+        else:
+            show_field()
     
     def update_video(self):
         """Update video display"""
         frame, *_ = self.reader.read_frame()
         if frame is not None:
-            # Store current frame for capture
-            self.current_frame = frame.copy()
+            # Rotate frame 180 degrees to correct camera orientation
+            rotated_frame = cv2.rotate(frame, cv2.ROTATE_180)
             
-            # Display frame
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            # Store rotated frame for capture and analysis
+            self.current_frame = rotated_frame.copy()
+            
+            # Display rotated frame
+            frame_rgb = cv2.cvtColor(rotated_frame, cv2.COLOR_BGR2RGB)
             img = Image.fromarray(frame_rgb)
             imgtk = ImageTk.PhotoImage(image=img.resize((640, 480)))
             self.video_label.imgtk = imgtk
@@ -726,7 +571,8 @@ class App(ctk.CTk):
     def setup_serial(self):
         """Setup serial connection"""
         self.serial_port = "/dev/ttyUSB0"  # change to "COM5" if on Windows
-        self.baudrate = 115200
+        # self.baudrate = 115200
+        self.baudrate = 9600
         try:
             self.ser = serial.Serial(self.serial_port, self.baudrate, timeout=1)
             self.running = True
@@ -746,11 +592,15 @@ class App(ctk.CTk):
                     data = self.ser.readline().decode().strip()
                     if data:
                         self.log_serial(f"Received: {data}")
-                        if data == '1' and not self.processing:
-                            # Start analysis
+                        if data == '1':
+                            if self.processing:
+                                # Reset and restart if already processing
+                                self.should_stop_processing = True
+                                time.sleep(0.1)  # Give time for current process to stop
                             self.start_analysis()
                         elif data == '0':
-                            # Reset analysis
+                            # Stop processing and reset
+                            self.should_stop_processing = True
                             self.reset_analysis()
                 except Exception as e:
                     print(f"Serial read error: {e}")
@@ -758,27 +608,25 @@ class App(ctk.CTk):
     
     def start_analysis(self):
         """Start the medicine analysis process"""
-        if self.processing:
-            return
-        
         self.processing = True
+        self.should_stop_processing = False
         self.detection_in_progress = True
-        self.log_serial("Starting analysis...")
+        self.log_serial("Starting new analysis...")
         
         # Show processing state
         self.show_processing_panel()
         self.detection_viz.start_detection()
         
         # Update status
-        self.processing_status.configure(text="Analyzing Medicine...")
+        self.processing_status.configure(text="Starting Analysis...")
         
         # Start analysis in separate thread
         threading.Thread(target=self.analysis_thread, daemon=True).start()
     
     def analysis_thread(self):
-        """Main analysis thread"""
+        """Main analysis thread with new workflow"""
         try:
-            # Step 1: Capture image
+            # Step 0: Capture image first
             self.update_status("Capturing image...")
             if hasattr(self, 'current_frame'):
                 self.captured_frame = self.current_frame.copy()
@@ -788,42 +636,63 @@ class App(ctk.CTk):
                 self.detection_in_progress = False
                 return
             
-            # Step 2: UCO Detection
-            self.update_status("Detecting medicine with YOLO...")
-            time.sleep(1)  # Sleep for 1 second as requested
+            # Check if we should stop
+            if self.should_stop_processing:
+                self.log_serial("Process stopped by user")
+                return
             
-            uco_result = self.detect_medicine()
-            is_valid_medicine = uco_result is not None
-            
-            # Step 3: OCR Analysis (now done before database lookup)
+            # Step 1: OCR Analysis First (don't display results yet)
             self.update_status("Performing OCR analysis...")
             ocr_result = self.perform_ocr()
             
-            # Step 4: Database lookup (method depends on YOLO result)
+            # Check if we should stop
+            if self.should_stop_processing:
+                self.log_serial("Process stopped by user")
+                return
+            
+            # Step 2: UCO Detection with retries
+            self.update_status("Detecting medicine with YOLO...")
+            uco_result = self.detect_medicine()
+            is_valid_medicine = uco_result is not None
+            
+            # Check if we should stop
+            if self.should_stop_processing:
+                self.log_serial("Process stopped by user")
+                return
+            
+            # Step 3: Database lookup based on detection result
             self.update_status("Fetching medicine data from database...")
             if is_valid_medicine:
                 # Valid detection - use YOLO value for database lookup
                 db_result = self.fetch_medicine_data_by_value(uco_result)
+                self.log_serial(f"Valid medicine detected with value: {uco_result}")
             else:
                 # Invalid detection - use OCR name for database lookup
                 medicine_name = getattr(ocr_result, 'name', None) if ocr_result else None
                 if medicine_name:
                     db_result = self.fetch_medicine_data_by_name(medicine_name)
+                    self.log_serial(f"Invalid medicine - searching database with name: {medicine_name}")
                 else:
                     db_result = None
-                    self.log_serial("No medicine name found in OCR for database lookup")
+                    self.log_serial("Invalid medicine - no name found for database lookup")
+            
+            # Check if we should stop before displaying results
+            if self.should_stop_processing:
+                self.log_serial("Process stopped by user")
+                return
             
             # Stop visual indicators
             self.detection_viz.stop_detection()
             
-            # Update UI with results
-            self.display_results(db_result, ocr_result, is_valid_medicine)
+            # Step 4: Display results with animations
+            self.display_results_with_animation(db_result, ocr_result, is_valid_medicine)
             
             self.update_status("Analysis complete. Waiting for next input...")
             
         except Exception as e:
-            self.update_status(f"Error: {str(e)}")
-            self.log_serial(f"Analysis error: {str(e)}")
+            if not self.should_stop_processing:
+                self.update_status(f"Error: {str(e)}")
+                self.log_serial(f"Analysis error: {str(e)}")
             self.detection_viz.stop_detection()
         finally:
             self.processing = False
@@ -832,6 +701,10 @@ class App(ctk.CTk):
     def detect_medicine(self):
         """Detect medicine using YOLO with retry logic"""
         for attempt in range(3):
+            # Check if we should stop
+            if self.should_stop_processing:
+                return None
+                
             self.update_status(f"YOLO detection attempt {attempt + 1}/3...")
             
             # Use the YOLO model directly on captured frame
@@ -910,76 +783,160 @@ class App(ctk.CTk):
             self.log_serial(f"OCR error: {str(e)}")
             return None
     
-    def display_results(self, db_result, ocr_result, is_valid_medicine):
-        """Display all results in UI with modern animations"""
-        if is_valid_medicine:
-            # Show valid medicine panel
-            self.show_valid_panel()
-            self.processing_status.configure(text="Medicine Verified Successfully")
-            
-            # Update medicine fields
-            if db_result:
-                self.update_medicine_field("name", db_result.get('name', 'N/A'))
-                self.update_medicine_field("value", str(db_result.get('value', 'N/A')))
-                
-                # Format alternatives nicely
-                alternatives = db_result.get('alternatives', {})
-                if alternatives:
-                    alt_text = "\n".join([f"{key}: {value}" for key, value in alternatives.items()])
-                    self.update_medicine_field("alternatives", alt_text)
-                else:
-                    self.update_medicine_field("alternatives", "No alternatives available")
+    def display_results_with_animation(self, db_result, ocr_result, is_valid_medicine):
+        """Display results with sequential fade animations"""
+        # Show result panel
+        self.show_result_panel(is_valid_medicine)
+        
+        # Prepare field data based on database and OCR results
+        field_sequence = []
+        delay_counter = 0
+        
+        # 1. Medicine Name
+        if db_result and db_result.get('name'):
+            name_field = self.create_result_field(
+                "name", 
+                "Medicine Name", 
+                db_result.get('name', 'N/A'),
+                "✓",
+                self.colors['success']
+            )
+            field_sequence.append((name_field, delay_counter))
+            delay_counter += 0.5
+        
+        # 2. License
+        if db_result and db_result.get('LIC'):
+            lic_field = self.create_result_field(
+                "license", 
+                "License", 
+                db_result.get('LIC', 'N/A'),
+                "✓",
+                self.colors['success']
+            )
+            field_sequence.append((lic_field, delay_counter))
+            delay_counter += 0.5
+        
+        # 3. Expiry Date
+        if db_result and db_result.get('expiry_date'):
+            expiry_field = self.create_result_field(
+                "expiry", 
+                "Expiry Date", 
+                db_result.get('expiry_date', 'N/A'),
+                "✓",
+                self.colors['success']
+            )
+            field_sequence.append((expiry_field, delay_counter))
+            delay_counter += 0.5
+        
+        # 4. Batch Number Comparison
+        db_batch = db_result.get('batch_number', '') if db_result else ''
+        ocr_batch = getattr(ocr_result, 'Batch_number', '') if ocr_result else ''
+        
+        if db_batch and ocr_batch:
+            # Compare batch numbers
+            batch_matches = db_batch.strip().lower() == ocr_batch.strip().lower()
+            if batch_matches:
+                batch_field = self.create_result_field(
+                    "batch", 
+                    "Batch Number", 
+                    f"Matched: {db_batch}",
+                    "✓",
+                    self.colors['success']
+                )
             else:
-                self.update_medicine_field("name", "Database lookup failed")
-                self.update_medicine_field("value", "N/A")
-                self.update_medicine_field("alternatives", "N/A")
+                batch_field = self.create_result_field(
+                    "batch", 
+                    "Batch Number", 
+                    f"Not Matched\nDB: {db_batch}\nOCR: {ocr_batch}",
+                    "✗",
+                    self.colors['error']
+                )
+            field_sequence.append((batch_field, delay_counter))
+            delay_counter += 0.5
+        elif db_batch:
+            # Only database batch available
+            batch_field = self.create_result_field(
+                "batch", 
+                "Batch Number", 
+                f"DB: {db_batch}\n(OCR not available)",
+                "?",
+                self.colors['warning']
+            )
+            field_sequence.append((batch_field, delay_counter))
+            delay_counter += 0.5
+        elif ocr_batch:
+            # Only OCR batch available
+            batch_field = self.create_result_field(
+                "batch", 
+                "Batch Number", 
+                f"OCR: {ocr_batch}\n(No DB match)",
+                "?",
+                self.colors['warning']
+            )
+            field_sequence.append((batch_field, delay_counter))
+            delay_counter += 0.5
+        
+        # 5. Alternatives
+        if db_result and db_result.get('alternatives'):
+            alternatives = db_result.get('alternatives', {})
+            if alternatives and isinstance(alternatives, dict):
+                alt_text = "\n".join([f"{key}: {value}" for key, value in alternatives.items()])
+            else:
+                alt_text = "No alternatives available"
             
-            # Update OCR fields
+            alt_field = self.create_result_field(
+                "alternatives", 
+                "Alternative Medicines", 
+                alt_text,
+                "ℹ",
+                self.colors['info']
+            )
+            field_sequence.append((alt_field, delay_counter))
+            delay_counter += 0.5
+        
+        # If no database result was found, show what we got from OCR
+        if not db_result:
             if ocr_result:
-                self.update_medicine_field("batch", getattr(ocr_result, 'Batch_number', 'N/A'))
-                self.update_medicine_field("expiry", getattr(ocr_result, 'expiry', 'N/A'))
-                self.update_medicine_field("license", getattr(ocr_result, 'LIC', 'N/A'))
-                self.update_medicine_field("manufacturer", getattr(ocr_result, 'Manufacturer', 'N/A'))
+                ocr_info = []
+                if hasattr(ocr_result, 'name') and ocr_result.name:
+                    ocr_info.append(f"Name: {ocr_result.name}")
+                if hasattr(ocr_result, 'Batch_number') and ocr_result.Batch_number:
+                    ocr_info.append(f"Batch: {ocr_result.Batch_number}")
+                if hasattr(ocr_result, 'expiry') and ocr_result.expiry:
+                    ocr_info.append(f"Expiry: {ocr_result.expiry}")
+                if hasattr(ocr_result, 'LIC') and ocr_result.LIC:
+                    ocr_info.append(f"License: {ocr_result.LIC}")
+                if hasattr(ocr_result, 'Manufacturer') and ocr_result.Manufacturer:
+                    ocr_info.append(f"Manufacturer: {ocr_result.Manufacturer}")
                 
-                # Format OCR analysis
-                ocr_text = f"Name: {getattr(ocr_result, 'name', 'N/A')}\n"
-                ocr_text += f"Batch: {getattr(ocr_result, 'Batch_number', 'N/A')}\n"
-                ocr_text += f"Expiry: {getattr(ocr_result, 'expiry', 'N/A')}\n"
-                ocr_text += f"License: {getattr(ocr_result, 'LIC', 'N/A')}\n"
-                ocr_text += f"Manufacturer: {getattr(ocr_result, 'Manufacturer', 'N/A')}"
-                self.update_medicine_field("ocr_analysis", ocr_text)
+                ocr_text = "\n".join(ocr_info) if ocr_info else "No Medicine Detected"
             else:
-                self.update_medicine_field("batch", "OCR failed")
-                self.update_medicine_field("expiry", "OCR failed")
-                self.update_medicine_field("license", "OCR failed")
-                self.update_medicine_field("manufacturer", "OCR failed")
-                self.update_medicine_field("ocr_analysis", "OCR analysis failed")
-                
-        else:
-            # Show invalid medicine panel
-            self.show_invalid_panel()
-            self.processing_status.configure(text="Invalid Medicine Detected")
+                ocr_text = "OCR analysis failed"
             
-            # Update OCR fields for invalid medicine
-            if ocr_result:
-                self.update_invalid_field("ocr_name", getattr(ocr_result, 'name', 'N/A'))
-                self.update_invalid_field("ocr_batch", getattr(ocr_result, 'Batch_number', 'N/A'))
-                self.update_invalid_field("ocr_expiry", getattr(ocr_result, 'expiry', 'N/A'))
-                self.update_invalid_field("ocr_license", getattr(ocr_result, 'LIC', 'N/A'))
-                self.update_invalid_field("ocr_manufacturer", getattr(ocr_result, 'Manufacturer', 'N/A'))
-            else:
-                self.update_invalid_field("ocr_name", "OCR failed")
-                self.update_invalid_field("ocr_batch", "OCR failed")
-                self.update_invalid_field("ocr_expiry", "OCR failed")
-                self.update_invalid_field("ocr_license", "OCR failed")
-                self.update_invalid_field("ocr_manufacturer", "OCR failed")
+            ocr_field = self.create_result_field(
+                "ocr_data", 
+                "Detection Status", 
+                ocr_text,
+                "ℹ",
+                self.colors['info']
+            )
+            field_sequence.append((ocr_field, delay_counter))
+            delay_counter += 0.5
             
-            # Update database lookup result
-            if db_result:
-                lookup_text = f"Found: {db_result.get('name', 'N/A')}"
-                self.update_invalid_field("db_lookup", lookup_text)
-            else:
-                self.update_invalid_field("db_lookup", "No matching medicine found in database")
+            # Show database lookup status
+            lookup_field = self.create_result_field(
+                "db_status", 
+                "Database Status", 
+                "No matching medicine found in database",
+                "✗",
+                self.colors['error']
+            )
+            field_sequence.append((lookup_field, delay_counter))
+        
+        # Animate all fields with delays
+        for field_frame, delay in field_sequence:
+            if not self.should_stop_processing:
+                self.animate_field_display(field_frame, delay)
     
     def update_status(self, message):
         """Update status label and processing text"""
@@ -989,11 +946,12 @@ class App(ctk.CTk):
         self.log_serial(f"Status: {message}")
     
     def log_serial(self, message):
-        """Add message to console log (since we don't have a serial log textbox in new UI)"""
+        """Add message to console log"""
         print(f"[{time.strftime('%H:%M:%S')}] {message}")
     
     def reset_analysis(self):
         """Reset all analysis data and UI"""
+        self.should_stop_processing = True
         self.processing = False
         self.detection_in_progress = False
         self.current_step = ""
@@ -1008,24 +966,65 @@ class App(ctk.CTk):
         # Show waiting state
         self.show_waiting_panel()
         
-        # Reset field values
-        for field_id, field_data in self.medicine_fields.items():
-            field_data['value'].configure(text="No data")
-            field_data['current_text'] = "No data"
-            
-        for field_id, field_data in self.invalid_fields.items():
-            field_data['value'].configure(text="No data")
-            field_data['current_text'] = "No data"
-        
         self.log_serial("System reset")
     
     def on_closing(self):
         """Clean up on closing"""
         self.running = False
+        self.should_stop_processing = True
         if hasattr(self, 'ser') and self.ser:
             self.ser.close()
         self.reader.release()
         self.destroy()
+
+    def create_status_bar(self):
+        # Professional status bar
+        self.status_bar = ctk.CTkFrame(
+            self,
+            fg_color=self.colors['card_bg'],
+            corner_radius=8,
+            height=50,
+            border_width=1,
+            border_color=self.colors['border']
+        )
+        self.status_bar.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+        self.status_bar.grid_propagate(False)
+        
+        # Status content
+        status_content = ctk.CTkFrame(self.status_bar, fg_color="transparent")
+        status_content.pack(fill="both", expand=True, padx=20, pady=12)
+        
+        # System status
+        self.system_status = ctk.CTkLabel(
+            status_content,
+            text="● System Online",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color=self.colors['success']
+        )
+        self.system_status.pack(side="left")
+        
+        # Processing status
+        self.processing_status = ctk.CTkLabel(
+            status_content,
+            text="Waiting for input...",
+            font=ctk.CTkFont(size=12),
+            text_color=self.colors['text_secondary']
+        )
+        self.processing_status.pack(side="left", padx=(30, 0))
+        
+        # Reset button
+        self.reset_button = ctk.CTkButton(
+            status_content,
+            text="RESET",
+            width=100,
+            height=28,
+            fg_color=self.colors['error'],
+            hover_color="#c82333",
+            corner_radius=6,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            command=self.reset_analysis
+        )
+        self.reset_button.pack(side="right")
 
 if __name__ == "__main__":
     app = App()

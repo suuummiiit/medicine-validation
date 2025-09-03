@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 from ultralytics import YOLO
 
 # Load YOLO model
-model = YOLO("best1.pt")
+model = YOLO("best.pt")
 
 cap = cv2.VideoCapture(2)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)   # optional, adjust if needed

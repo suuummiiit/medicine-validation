@@ -3,7 +3,7 @@
     "value": 809290,
     "name": "Bevon",
     "batch_number": "Z06AH25023",
-    "LIC": null,
+    "LIC": "KTK/28/444/2017",
     "expiry_date": "2026-09",
     "alternatives": {
       "1": "Zincovit",
@@ -17,7 +17,7 @@
     "value": 165772,
     "name": "PANTOAGMA-D",
     "batch_number": "ABX07AAA",
-    "LIC": null,
+    "LIC": "31/UA/2013",
     "expiry_date": "2027-03",
     "alternatives": {
       "1": "Pantosern-D",
@@ -72,9 +72,9 @@
   {
     "value": 694842,
     "name": "Akulc",
-    "batch_number": "MNT - 125226",
-    "LIC": null,
-    "expiry_date": "2026-06",
+    "batch_number": "MNT-525167",
+    "LIC": 10018064001272,
+    "expiry_date": "2026-10",
     "alternatives": {
       "1": "Alnuron-LC",
       "2": "Cobaleo-LC",

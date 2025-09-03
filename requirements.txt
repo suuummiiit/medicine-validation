@@ -1,0 +1,10 @@
+opencv-python
+customtkinter
+pillow
+pyserial
+pymongo
+python-dotenv
+google-generativeai
+openai
+pydantic
+ultralytics

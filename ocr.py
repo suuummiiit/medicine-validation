@@ -12,7 +12,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-Model = "gpt-4o-mini"
+Model = "gpt-4.1-mini"
 
 # System message
 system_message = """
@@ -60,7 +60,7 @@ def get_medicine_data(image_path: str) -> MedicineInfo:
 
 # Example usage
 if __name__ == "__main__":
-    image_path = "test/test.jpg"  # Change this to your local image path
+    image_path = "test/testocr.png"  # Change this to your local image path
     data = get_medicine_data(image_path)
     print("OCR OUTPUT")
     print(data)
